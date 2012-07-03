@@ -108,7 +108,7 @@ public class Extras extends JavaPlugin implements Listener {
                 ((Socket) listenThread.getClass().getDeclaredField("d").get(listenThread)).close();
                 //
                 try {
-                    getServer().shutdown();
+                    ((CraftServer) getServer()).getHandle().server.stop();
                 } catch (Throwable t) {
                     //
                 }
