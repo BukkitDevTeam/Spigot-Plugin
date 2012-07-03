@@ -7,6 +7,7 @@ import java.net.UnknownHostException;
 import net.minecraft.server.NetworkListenThread;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,6 +27,15 @@ public class Extras extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
+        FileConfiguration conf = getConfig();
+        conf.options().copyDefaults(true);
+        saveConfig();
+        restartScriptLocation = conf.getString("restart-script-location");
+        timeoutTime = conf.getInt("timeout-time");
+        restartOnCrash = conf.getBoolean("restart-on-crash");
+        filterUnsafeIps = conf.getBoolean("filter-unsafe-ips");
+        whitelistMessage = conf.getString("whitelist-message");
+        //
         getServer().getPluginManager().registerEvents(this, this);
     }
 
