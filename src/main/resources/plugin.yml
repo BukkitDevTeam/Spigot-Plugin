@@ -1,0 +1,17 @@
+name: ${project.name}
+version: ${build.number}
+description: ${project.description}
+author: md_5
+website: ${project.url}
+
+main: com.md_5.craftbukkit.Extras
+
+commands:
+  restart:
+    description: Restart the server
+    permission: extras.restart
+
+permissions:
+  extras.restart:
+    description: Allows restarting of the server
+    default: op

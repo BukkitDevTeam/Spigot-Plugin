@@ -1,0 +1,6 @@
+# ${project.name} configuration
+restart-script-location: start.bat
+timeout-time: 180
+restart-on-crash: false
+filter-unsafe-ips: true
+whitelist-message: You are not white-listed on this server!
