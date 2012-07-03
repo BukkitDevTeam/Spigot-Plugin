@@ -8,7 +8,7 @@
     <version>dev-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>CraftBukkit Extras</name>
+    <name>CraftBukkit-Extras</name>
     <description>A set of utility features to support CraftBukkit--</description>
     <url>https://github.com/EcoCityCraft/CraftBukkit-Extras</url>
 
