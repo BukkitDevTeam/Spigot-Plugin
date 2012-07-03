@@ -42,6 +42,8 @@ public class Extras extends JavaPlugin implements Listener {
         filterUnsafeIps = conf.getBoolean("filter-unsafe-ips");
         whitelistMessage = conf.getString("whitelist-message");
         //
+        ((CraftServer) getServer()).getHandle().server.primaryThread.setUncaughtExceptionHandler(new ExceptionHandler());
+        //
         watchdog = new WatchdogThread(timeoutTime * 1000L, restartOnCrash);
         getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
             public void run() {
