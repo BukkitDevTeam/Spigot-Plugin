@@ -3,7 +3,7 @@ package com.md_5.craftbukkit;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
-import java.net.Socket;
+import java.net.ServerSocket;
 import java.net.UnknownHostException;
 import net.minecraft.server.NetworkListenThread;
 import org.bukkit.command.Command;
@@ -110,7 +110,7 @@ public class Extras extends JavaPlugin implements Listener {
                 //
                 Field field = listenThread.getClass().getDeclaredField("d");
                 field.setAccessible(true);
-                ((Socket) field.get(listenThread)).close();
+                ((ServerSocket) field.get(listenThread)).close();
                 //
                 try {
                     ((CraftServer) getServer()).getHandle().server.stop();
