@@ -19,14 +19,20 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Extras extends JavaPlugin implements Listener {
 
+    public static Extras instance;
+    //
     private String restartScriptLocation;
     private int timeoutTime;
     private boolean restartOnCrash;
     private boolean filterUnsafeIps;
     private String whitelistMessage;
+    //
+    private WatchdogThread watchdog;
 
     @Override
     public void onEnable() {
+        instance = this;
+        //
         FileConfiguration conf = getConfig();
         conf.options().copyDefaults(true);
         saveConfig();
@@ -35,6 +41,13 @@ public class Extras extends JavaPlugin implements Listener {
         restartOnCrash = conf.getBoolean("restart-on-crash");
         filterUnsafeIps = conf.getBoolean("filter-unsafe-ips");
         whitelistMessage = conf.getString("whitelist-message");
+        //
+        watchdog = new WatchdogThread(timeoutTime * 1000L, restartOnCrash);
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+            public void run() {
+                watchdog.tick();
+            }
+        }, 1, 1);
         //
         getServer().getPluginManager().registerEvents(this, this);
     }
