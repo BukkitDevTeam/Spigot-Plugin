@@ -56,6 +56,15 @@ public class Extras extends JavaPlugin implements Listener {
     }
 
     @Override
+    public void onDisable() {
+        watchdog.interrupt();
+        try {
+            watchdog.join();
+        } catch (InterruptedException ex) {
+        }
+    }
+
+    @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         restart();
         return true;
