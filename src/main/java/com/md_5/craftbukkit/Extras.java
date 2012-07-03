@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.UnknownHostException;
+import net.minecraft.server.Block;
 import net.minecraft.server.NetworkListenThread;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -52,7 +53,30 @@ public class Extras extends JavaPlugin implements Listener {
             }
         }, 1, 1);
         //
+        register(75, 115, false);
+        register(76, 99, true);
+        //
         getServer().getPluginManager().registerEvents(this, this);
+    }
+
+    private void register(int i, int j, boolean flag) {
+        Block.byId[i] = null;
+        boolean n = Block.n[i];
+        int lightBlock = Block.lightBlock[i];
+        boolean p = Block.p[i];
+        int lightEmission = Block.lightEmission[i];
+        boolean r = Block.r[i];
+        boolean s = Block.s[i];
+        //
+        Block replaced = new SpecialRedstoneTorch(i, j, flag);
+        getLogger().info("Replaced block id: " + replaced.id);
+        //
+        Block.n[i] = n;
+        Block.lightBlock[i] = lightBlock;
+        Block.p[i] = p;
+        Block.lightEmission[i] = lightEmission;
+        Block.r[i] = r;
+        Block.s[i] = s;
     }
 
     @Override
