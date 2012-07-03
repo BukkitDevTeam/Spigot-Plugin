@@ -5,7 +5,6 @@ author: md_5
 website: ${project.url}
 
 main: com.md_5.craftbukkit.Extras
-load: STARTUP
 
 commands:
   restart:
