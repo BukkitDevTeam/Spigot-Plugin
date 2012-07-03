@@ -1,6 +1,7 @@
 package com.md_5.craftbukkit;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -83,7 +84,7 @@ public class Extras extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPlayerLogin(PlayerLoginEvent event) {
-        if (!event.getPlayer().isWhitelisted()) {
+        if (getServer().hasWhitelist() && !event.getPlayer().isWhitelisted()) {
             event.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, whitelistMessage);
         }
     }
@@ -107,7 +108,9 @@ public class Extras extends JavaPlugin implements Listener {
                     //
                 }
                 //
-                ((Socket) listenThread.getClass().getDeclaredField("d").get(listenThread)).close();
+                Field field = listenThread.getClass().getDeclaredField("d");
+                field.setAccessible(true);
+                ((Socket) field.get(listenThread)).close();
                 //
                 try {
                     ((CraftServer) getServer()).getHandle().server.stop();
