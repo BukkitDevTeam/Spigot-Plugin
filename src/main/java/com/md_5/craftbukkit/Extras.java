@@ -5,14 +5,24 @@ import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.UnknownHostException;
+import java.util.Map;
 import net.minecraft.server.Block;
-import net.minecraft.server.IDataManager;
+import net.minecraft.server.ChunkCoordinates;
+import net.minecraft.server.ConvertProgressUpdater;
+import net.minecraft.server.Convertable;
+import net.minecraft.server.EntityTracker;
+import net.minecraft.server.IProgressUpdate;
+import net.minecraft.server.IWorldAccess;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.NetworkListenThread;
-import net.minecraft.server.WorldData;
+import net.minecraft.server.ServerNBTManager;
+import net.minecraft.server.WorldLoaderServer;
+import net.minecraft.server.WorldManager;
+import net.minecraft.server.WorldMapCollection;
 import net.minecraft.server.WorldServer;
 import net.minecraft.server.WorldSettings;
-import org.bukkit.World.Environment;
+import net.minecraft.server.WorldType;
+import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -25,6 +35,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerPreLoginEvent;
+import org.bukkit.event.world.WorldInitEvent;
+import org.bukkit.event.world.WorldLoadEvent;
+import org.bukkit.event.world.WorldSaveEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -40,7 +54,8 @@ public class Extras extends JavaPlugin implements Listener {
     //
     private WatchdogThread watchdog;
     //
-    private MinecraftServer server;
+    private MinecraftServer console;
+    private Map<String,World> worlds;
 
     @Override
     public void onEnable() {
@@ -55,8 +70,11 @@ public class Extras extends JavaPlugin implements Listener {
         filterUnsafeIps = conf.getBoolean("filter-unsafe-ips");
         whitelistMessage = conf.getString("whitelist-message");
         //
-        server = ((CraftServer) getServer()).getHandle().server;
-        server.primaryThread.setUncaughtExceptionHandler(new ExceptionHandler());
+        console = ((CraftServer) getServer()).getHandle().server;
+        worlds = (Map<String, World>) getPrivate(console.server, "worlds");;
+        console.primaryThread.setUncaughtExceptionHandler(new ExceptionHandler());
+        //
+        hijackWorlds();
         //
         watchdog = new WatchdogThread(timeoutTime * 1000L, restartOnCrash);
         getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
@@ -73,18 +91,20 @@ public class Extras extends JavaPlugin implements Listener {
 
     private void hijackWorlds() {
         for (org.bukkit.World w : getServer().getWorlds()) {
-            WorldServer world = (WorldServer) ((CraftWorld) w).getHandle();
-            WorldData data = world.worldData;
-            WorldCreator c = new WorldCreator(whitelistMessage)
+            WorldCreator creator = new WorldCreator(w.getName());
+            creator.seed(w.getSeed());
+            creator.environment(w.getEnvironment());
+            creator.generator(w.getGenerator());
+            creator.type(w.getWorldType());
+            creator.generateStructures(w.canGenerateStructures());
             //
-            IDataManager dataManager = world.getDataManager();
-            String name = data.name;
-            int dimension = world.dimension;
-            WorldSettings settings = new WorldSettings(data.getSeed(), data.getGameType(), data.isHardcore(), data.shouldGenerateMapFeatures(), data.getType());
-            Environment env = w.getEnvironment();
-            ChunkGenerator gen = world.generator;
+            int gamemode = getServer().getDefaultGameMode().getValue();
+            WorldMapCollection maps = ((CraftWorld)w).getHandle().worldMaps;
             //
-            getServer().unloadWorld(w, true);
+            unloadWorld(w,true);
+            getLogger().info("Unloaded world " + w.getName());
+            //
+            createWorld(creator, gamemode, maps);
         }
     }
 
@@ -193,5 +213,155 @@ public class Extras extends JavaPlugin implements Listener {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    public World createWorld(WorldCreator creator, int gamemode, WorldMapCollection maps) {
+        CraftServer craft = console.server;
+        //
+        if (creator == null) {
+            throw new IllegalArgumentException("Creator may not be null");
+        }
+
+        String name = creator.name();
+        ChunkGenerator generator = creator.generator();
+        File folder = new File(craft.getWorldContainer(), name);
+        World world = craft.getWorld(name);
+        WorldType type = WorldType.getType(creator.type().getName());
+        boolean generateStructures = creator.generateStructures();
+
+        if (world != null) {
+            return world;
+        }
+
+        if ((folder.exists()) && (!folder.isDirectory())) {
+            throw new IllegalArgumentException("File exists with the name '" + name + "' and isn't a folder");
+        }
+
+        if (generator == null) {
+            generator = craft.getGenerator(name);
+        }
+
+        Convertable converter = new WorldLoaderServer(craft.getWorldContainer());
+        if (converter.isConvertable(name)) {
+            getLogger().info("Converting world '" + name + "'");
+            converter.convert(name, new ConvertProgressUpdater(console));
+        }
+
+        int dimension = 10 + console.worlds.size();
+        boolean used = false;
+        do {
+            for (WorldServer server : console.worlds) {
+                used = server.dimension == dimension;
+                if (used) {
+                    dimension++;
+                    break;
+                }
+            }
+        } while (used);
+        boolean hardcore = false;
+
+        WorldServer internal = new SpecialWorld(console, new ServerNBTManager(craft.getWorldContainer(), name, true), name, dimension, new WorldSettings(creator.seed(), gamemode, generateStructures, hardcore, type), creator.environment(), generator);
+
+        if (!(worlds.containsKey(name.toLowerCase()))) {
+            return null;
+        }
+
+        internal.worldMaps = maps;
+
+        internal.tracker = new EntityTracker(console, internal); // CraftBukkit
+        internal.addIWorldAccess((IWorldAccess) new WorldManager(console, internal));
+        internal.difficulty = 1;
+        internal.setSpawnFlags(true, true);
+        console.worlds.add(internal);
+
+        if (generator != null) {
+            internal.getWorld().getPopulators().addAll(generator.getDefaultPopulators(internal.getWorld()));
+        }
+
+        getServer().getPluginManager().callEvent(new WorldInitEvent(internal.getWorld()));
+        System.out.print("Preparing start region for level " + (console.worlds.size() - 1) + " (Seed: " + internal.getSeed() + ")");
+
+        if (internal.getWorld().getKeepSpawnInMemory()) {
+            short short1 = 196;
+            long i = System.currentTimeMillis();
+            for (int j = -short1; j <= short1; j += 16) {
+                for (int k = -short1; k <= short1; k += 16) {
+                    long l = System.currentTimeMillis();
+
+                    if (l < i) {
+                        i = l;
+                    }
+
+                    if (l > i + 1000L) {
+                        int i1 = (short1 * 2 + 1) * (short1 * 2 + 1);
+                        int j1 = (j + short1) * (short1 * 2 + 1) + k + 1;
+
+                        System.out.println("Preparing spawn area for " + name + ", " + (j1 * 100 / i1) + "%");
+                        i = l;
+                    }
+
+                    ChunkCoordinates chunkcoordinates = internal.getSpawn();
+                    internal.chunkProviderServer.getChunkAt(chunkcoordinates.x + j >> 4, chunkcoordinates.z + k >> 4);
+
+                    while (internal.updateLights()) {
+                        ;
+                    }
+                }
+            }
+        }
+        getServer().getPluginManager().callEvent(new WorldLoadEvent(internal.getWorld()));
+        return internal.getWorld();
+    }
+
+    public boolean unloadWorld(World world, boolean save) {
+        if (world == null) {
+            return false;
+        }
+
+        WorldServer handle = ((CraftWorld) world).getHandle();
+
+        if (!(console.worlds.contains(handle))) {
+            return false;
+        }
+
+        /*
+         if (!(handle.dimension > 1)) {
+         return false;
+         }
+         */
+        if (handle.players.size() > 0) {
+            return false;
+        }
+
+        WorldUnloadEvent e = new WorldUnloadEvent(handle.getWorld());
+        getServer().getPluginManager().callEvent(e);
+
+        if (e.isCancelled()) {
+            return false;
+        }
+
+        if (save) {
+            handle.save(true, (IProgressUpdate) null);
+            handle.saveLevel();
+            WorldSaveEvent event = new WorldSaveEvent(handle.getWorld());
+            getServer().getPluginManager().callEvent(event);
+        }
+
+        worlds.remove(world.getName().toLowerCase());
+        console.worlds.remove(console.worlds.indexOf(handle));
+
+        return true;
+    }
+
+    private Object getPrivate(Object clazz, String field) {
+        Object result = null;
+        try {
+            Field f = clazz.getClass().getDeclaredField(field);
+            f.setAccessible(true);
+            result = f.get(clazz);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return result;
     }
 }
