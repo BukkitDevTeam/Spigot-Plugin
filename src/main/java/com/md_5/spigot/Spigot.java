@@ -98,13 +98,14 @@ public class Spigot extends JavaPlugin implements Listener {
             creator.type(w.getWorldType());
             creator.generateStructures(w.canGenerateStructures());
             //
+            int dimension = ((CraftWorld) w).getHandle().dimension;
             int gamemode = getServer().getDefaultGameMode().getValue();
             WorldMapCollection maps = ((CraftWorld) w).getHandle().worldMaps;
             //
             unloadWorld(w, true);
             getLogger().info("Unloaded world " + w.getName());
             //
-            createWorld(creator, gamemode, maps);
+            createWorld(creator, gamemode, maps, dimension);
         }
     }
 
@@ -122,7 +123,7 @@ public class Spigot extends JavaPlugin implements Listener {
             Block replaced = null;
             switch (i) {
                 case 2:
-                    replaced = new SpecialGrass(i);
+                    //replaced = new SpecialGrass(i);
                     break;
                 case 6:
                     replaced = new SpecialSapling(i, 15);
@@ -251,7 +252,7 @@ public class Spigot extends JavaPlugin implements Listener {
         }
     }
 
-    public World createWorld(WorldCreator creator, int gamemode, WorldMapCollection maps) {
+    public World createWorld(WorldCreator creator, int gamemode, WorldMapCollection maps,int dimension) {
         CraftServer craft = console.server;
         //
         if (creator == null) {
@@ -283,7 +284,6 @@ public class Spigot extends JavaPlugin implements Listener {
             converter.convert(name, new ConvertProgressUpdater(console));
         }
 
-        int dimension = 10 + console.worlds.size();
         boolean used = false;
         do {
             for (WorldServer server : console.worlds) {
