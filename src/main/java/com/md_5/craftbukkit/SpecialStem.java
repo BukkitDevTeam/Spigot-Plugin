@@ -19,7 +19,7 @@ public class SpecialStem extends BlockStem {
         if (world.getLightLevel(i, j + 1, k) >= 9) {
             float f = this.i(world, i, j, k);
 
-            if (random.nextInt((int) ((25.0F / world.growthOdds) / f) + 1) == 0) { // CraftBukkit--
+            if (random.nextInt((int) ((25.0F / SpecialWorld.growthOdds) / f) + 1) == 0) { // CraftBukkit--
                 int l = world.getData(i, j, k);
 
                 if (l < 7) {

@@ -22,7 +22,7 @@ public class SpecialReed extends BlockReed {
                 int i1 = world.getData(i, j, k);
 
                 // CraftBukkit-- start
-                byte neededData = (byte) Math.max(3, (int) ((world.growthOdds * 15 / 100F) + 0.5F));
+                byte neededData = (byte) Math.max(3, (int) ((SpecialWorld.growthOdds * 15 / 100F) + 0.5F));
                 if (i1 >= neededData) {
                     // CraftBukkit-- end
                     org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockGrowEvent(world, i, j + 1, k, this.id, 0); // CraftBukkit

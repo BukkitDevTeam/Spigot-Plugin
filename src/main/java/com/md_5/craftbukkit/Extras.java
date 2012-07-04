@@ -7,6 +7,7 @@ import java.net.ServerSocket;
 import java.net.UnknownHostException;
 import java.util.Map;
 import net.minecraft.server.Block;
+import net.minecraft.server.BlockStem;
 import net.minecraft.server.ChunkCoordinates;
 import net.minecraft.server.ConvertProgressUpdater;
 import net.minecraft.server.Convertable;
@@ -55,7 +56,7 @@ public class Extras extends JavaPlugin implements Listener {
     private WatchdogThread watchdog;
     //
     private MinecraftServer console;
-    private Map<String,World> worlds;
+    private Map<String, World> worlds;
 
     @Override
     public void onEnable() {
@@ -83,8 +84,7 @@ public class Extras extends JavaPlugin implements Listener {
             }
         }, 1, 1);
         //
-        register(75, 115, false);
-        register(76, 99, true);
+        register();
         //
         getServer().getPluginManager().registerEvents(this, this);
     }
@@ -99,33 +99,69 @@ public class Extras extends JavaPlugin implements Listener {
             creator.generateStructures(w.canGenerateStructures());
             //
             int gamemode = getServer().getDefaultGameMode().getValue();
-            WorldMapCollection maps = ((CraftWorld)w).getHandle().worldMaps;
+            WorldMapCollection maps = ((CraftWorld) w).getHandle().worldMaps;
             //
-            unloadWorld(w,true);
+            unloadWorld(w, true);
             getLogger().info("Unloaded world " + w.getName());
             //
             createWorld(creator, gamemode, maps);
         }
     }
 
-    private void register(int i, int j, boolean flag) {
-        Block.byId[i] = null;
-        boolean n = Block.n[i];
-        int lightBlock = Block.lightBlock[i];
-        boolean p = Block.p[i];
-        int lightEmission = Block.lightEmission[i];
-        boolean r = Block.r[i];
-        boolean s = Block.s[i];
-        //
-        Block replaced = new SpecialRedstoneTorch(i, j, flag);
-        getLogger().info("Replaced block id: " + replaced.id);
-        //
-        Block.n[i] = n;
-        Block.lightBlock[i] = lightBlock;
-        Block.p[i] = p;
-        Block.lightEmission[i] = lightEmission;
-        Block.r[i] = r;
-        Block.s[i] = s;
+    private void register() {
+        for (int i = 0; i < 255; i++) {
+            Block old = Block.byId[i];
+            boolean n = Block.n[i];
+            int lightBlock = Block.lightBlock[i];
+            boolean p = Block.p[i];
+            int lightEmission = Block.lightEmission[i];
+            boolean r = Block.r[i];
+            boolean s = Block.s[i];
+            //
+            Block.byId[i] = null;
+            Block replaced = null;
+            switch (i) {
+                case 2:
+                    replaced = new SpecialGrass(i);
+                    break;
+                case 6:
+                    replaced = new SpecialSapling(i, 15);
+                    break;
+                case 59:
+                    replaced = new SpecialCrops(i, 88);
+                    break;
+                case 75:
+                    replaced = new SpecialRedstoneTorch(i, 115, false);
+                    break;
+                case 76:
+                    replaced = new SpecialRedstoneTorch(i, 99, true);
+                    break;
+                case 81:
+                    replaced = new SpecialCactus(i, 70);
+                    break;
+                case 83:
+                    replaced = new SpecialReed(i, 71);
+                    break;
+                case 104:
+                    replaced = new SpecialStem(i, Block.PUMPKIN);
+                    break;
+                case 105:
+                    replaced = new SpecialStem(i, Block.MELON);
+                    break;
+            }
+            if (replaced != null) {
+                getLogger().info("Replaced block id: " + replaced.id);
+            } else {
+                Block.byId[i] = old;
+            }
+            //
+            Block.n[i] = n;
+            Block.lightBlock[i] = lightBlock;
+            Block.p[i] = p;
+            Block.lightEmission[i] = lightEmission;
+            Block.r[i] = r;
+            Block.s[i] = s;
+        }
     }
 
     @Override

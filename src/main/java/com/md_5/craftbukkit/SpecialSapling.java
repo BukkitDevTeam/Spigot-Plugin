@@ -15,8 +15,8 @@ public class SpecialSapling extends BlockSapling {
         if (!world.isStatic) {
             super.a(world, i, j, k, random);
             // CraftBukkit-- start
-            int rand = Math.max(2, (int) ((world.growthOdds * 7 / 100F) + 0.5F));
-            if (world.getLightLevel(i, j + 1, k) >= 9 && (world.growthOdds < 14F || random.nextInt(rand) == 0)) {
+            int rand = Math.max(2, (int) ((SpecialWorld.growthOdds * 7 / 100F) + 0.5F));
+            if (world.getLightLevel(i, j + 1, k) >= 9 && (SpecialWorld.growthOdds < 14F || random.nextInt(rand) == 0)) {
                 // CraftBukkit-- end
                 int l = world.getData(i, j, k);
 

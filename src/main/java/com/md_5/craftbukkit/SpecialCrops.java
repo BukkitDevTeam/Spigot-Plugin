@@ -19,7 +19,7 @@ public class SpecialCrops extends BlockCrops {
             if (l < 7) {
                 float f = this.i(world, i, j, k);
 
-                if (random.nextInt((int) ((25.0F / world.growthOdds) / f) + 1) == 0) { // CraftBukkit--
+                if (random.nextInt((int) ((25.0F / SpecialWorld.growthOdds) / f) + 1) == 0) { // CraftBukkit--
                     org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockGrowEvent(world, i, j, k, this.id, ++l); // CraftBukkit
                 }
             }

@@ -31,7 +31,7 @@ public class SpecialGrass extends BlockGrass {
                 // CraftBukkit end
             } else if (world.getLightLevel(i, j + 1, k) >= 9) {
                 // CraftBukkit-- start
-                int loops = Math.max(4, Math.max(20, (int) (4 * 100F / world.growthOdds)));
+                int loops = Math.max(4, Math.max(20, (int) (4 * 100F / SpecialWorld.growthOdds)));
                 for (int l = 0; l < loops; ++l) {
                     // CraftBukkit-- end
                     int i1 = i + random.nextInt(3) - 1;
