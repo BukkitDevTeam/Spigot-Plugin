@@ -6,17 +6,26 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.UnknownHostException;
 import net.minecraft.server.Block;
+import net.minecraft.server.IDataManager;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.NetworkListenThread;
+import net.minecraft.server.WorldData;
+import net.minecraft.server.WorldServer;
+import net.minecraft.server.WorldSettings;
+import org.bukkit.World.Environment;
+import org.bukkit.WorldCreator;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.craftbukkit.CraftServer;
+import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerPreLoginEvent;
+import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Extras extends JavaPlugin implements Listener {
@@ -30,6 +39,8 @@ public class Extras extends JavaPlugin implements Listener {
     private String whitelistMessage;
     //
     private WatchdogThread watchdog;
+    //
+    private MinecraftServer server;
 
     @Override
     public void onEnable() {
@@ -44,7 +55,8 @@ public class Extras extends JavaPlugin implements Listener {
         filterUnsafeIps = conf.getBoolean("filter-unsafe-ips");
         whitelistMessage = conf.getString("whitelist-message");
         //
-        ((CraftServer) getServer()).getHandle().server.primaryThread.setUncaughtExceptionHandler(new ExceptionHandler());
+        server = ((CraftServer) getServer()).getHandle().server;
+        server.primaryThread.setUncaughtExceptionHandler(new ExceptionHandler());
         //
         watchdog = new WatchdogThread(timeoutTime * 1000L, restartOnCrash);
         getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
@@ -57,6 +69,23 @@ public class Extras extends JavaPlugin implements Listener {
         register(76, 99, true);
         //
         getServer().getPluginManager().registerEvents(this, this);
+    }
+
+    private void hijackWorlds() {
+        for (org.bukkit.World w : getServer().getWorlds()) {
+            WorldServer world = (WorldServer) ((CraftWorld) w).getHandle();
+            WorldData data = world.worldData;
+            WorldCreator c = new WorldCreator(whitelistMessage)
+            //
+            IDataManager dataManager = world.getDataManager();
+            String name = data.name;
+            int dimension = world.dimension;
+            WorldSettings settings = new WorldSettings(data.getSeed(), data.getGameType(), data.isHardcore(), data.shouldGenerateMapFeatures(), data.getType());
+            Environment env = w.getEnvironment();
+            ChunkGenerator gen = world.generator;
+            //
+            getServer().unloadWorld(w, true);
+        }
     }
 
     private void register(int i, int j, boolean flag) {
