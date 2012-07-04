@@ -2,12 +2,12 @@ package com.md_5.spigot;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.UnknownHostException;
 import java.util.Map;
 import net.minecraft.server.Block;
-import net.minecraft.server.BlockStem;
 import net.minecraft.server.ChunkCoordinates;
 import net.minecraft.server.ConvertProgressUpdater;
 import net.minecraft.server.Convertable;
@@ -297,7 +297,6 @@ public class Spigot extends JavaPlugin implements Listener {
         boolean hardcore = false;
 
         WorldServer internal = new SpecialWorld(console, new ServerNBTManager(craft.getWorldContainer(), name, true), name, dimension, new WorldSettings(creator.seed(), gamemode, generateStructures, hardcore, type), creator.environment(), generator);
-        setPrivate(internal, "server", new SpecialCraftWorld(internal, generator, creator.environment()));
         if (!(worlds.containsKey(name.toLowerCase()))) {
             return null;
         }
@@ -401,11 +400,15 @@ public class Spigot extends JavaPlugin implements Listener {
         return result;
     }
 
-    private void setPrivate(Object clazz, String field, Object value) {
+    public static void setPrivate(Class clazz, Object obj, String field, Object value) {
         try {
-            Field f = clazz.getClass().getDeclaredField(field);
+
+            Field f = clazz.getDeclaredField(field);
             f.setAccessible(true);
-            f.set(clazz, value);
+            Field modifiersField = Field.class.getDeclaredField("modifiers");
+            modifiersField.setAccessible(true);
+            modifiersField.setInt(f, f.getModifiers() & ~Modifier.FINAL);
+            f.set(obj, value);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

@@ -22,6 +22,7 @@ import net.minecraft.server.IDataManager;
 import net.minecraft.server.MathHelper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.NPC;
+import net.minecraft.server.World;
 import net.minecraft.server.WorldServer;
 import net.minecraft.server.WorldSettings;
 import org.bukkit.Bukkit;
@@ -47,6 +48,7 @@ public class SpecialWorld extends WorldServer {
     public SpecialWorld(MinecraftServer minecraftserver, IDataManager idatamanager, String s, int i, WorldSettings worldsettings, Environment env, ChunkGenerator gen) {
         super(minecraftserver, idatamanager, s, i, worldsettings, env, gen);
         //
+        Spigot.setPrivate(World.class, this, "world", new SpecialCraftWorld(this, generator, env));
         this.chunkTickList = new TLongShortHashMap(((SpecialCraftWorld) this.getWorld()).growthPerTick * 5);
         this.chunkTickList.setAutoCompactionFactor(0.0F);
     }
