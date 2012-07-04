@@ -297,6 +297,8 @@ public class Spigot extends JavaPlugin implements Listener {
         boolean hardcore = false;
 
         WorldServer internal = new SpecialWorld(console, new ServerNBTManager(craft.getWorldContainer(), name, true), name, dimension, new WorldSettings(creator.seed(), gamemode, generateStructures, hardcore, type), creator.environment(), generator);
+        worlds.remove(name.toLowerCase());
+        worlds.put(name.toLowerCase(), internal.getWorld());
         if (!(worlds.containsKey(name.toLowerCase()))) {
             return null;
         }
