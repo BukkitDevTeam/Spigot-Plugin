@@ -47,7 +47,7 @@ public class SpecialWorld extends WorldServer {
     public SpecialWorld(MinecraftServer minecraftserver, IDataManager idatamanager, String s, int i, WorldSettings worldsettings, Environment env, ChunkGenerator gen) {
         super(minecraftserver, idatamanager, s, i, worldsettings, env, gen);
         //
-        this.chunkTickList = new TLongShortHashMap(getWorld().growthPerTick * 5);
+        this.chunkTickList = new TLongShortHashMap(((SpecialCraftWorld) this.getWorld()).growthPerTick * 5);
         this.chunkTickList.setAutoCompactionFactor(0.0F);
     }
 
@@ -86,7 +86,7 @@ public class SpecialWorld extends WorldServer {
             EntityItem item = (EntityItem) entity;
             int maxSize = item.itemStack.getMaxStackSize();
             if (item.itemStack.count < maxSize) {
-                double radius = this.getWorld().itemMergeRadius;
+                double radius = ((SpecialCraftWorld) this.getWorld()).itemMergeRadius;
                 if (radius > 0) {
                     List<Entity> entities = this.getEntities(entity, entity.boundingBox.grow(radius, radius, radius));
                     for (Entity e : entities) {
@@ -106,7 +106,7 @@ public class SpecialWorld extends WorldServer {
             }
         } else if (entity instanceof EntityExperienceOrb) {
             EntityExperienceOrb xp = (EntityExperienceOrb) entity;
-            double radius = this.getWorld().itemMergeRadius;
+            double radius = ((SpecialCraftWorld) this.getWorld()).itemMergeRadius;
             if (radius > 0) {
                 List<Entity> entities = this.getEntities(entity, entity.boundingBox.grow(radius, radius, radius));
                 for (Entity e : entities) {
@@ -288,7 +288,7 @@ public class SpecialWorld extends WorldServer {
         int j;
         int k;
 
-        final int optimalChunks = this.getWorld().growthPerTick;
+        final int optimalChunks = ((SpecialCraftWorld) this.getWorld()).growthPerTick;
 
         if (optimalChunks <= 0) {
             return;
@@ -334,7 +334,7 @@ public class SpecialWorld extends WorldServer {
         }
 
         // MethodProfiler.a("playerCheckLight"); // CraftBukkit - not in production code
-        if (!this.players.isEmpty() && this.getWorld().randomLightingUpdates) { // CraftBukkit--
+        if (!this.players.isEmpty() && ((SpecialCraftWorld) this.getWorld()).randomLightingUpdates) { // CraftBukkit--
             i = this.random.nextInt(this.players.size());
             entityhuman = (EntityHuman) this.players.get(i);
             j = MathHelper.floor(entityhuman.locX) + this.random.nextInt(11) - 5;
@@ -384,7 +384,7 @@ public class SpecialWorld extends WorldServer {
         if (this.aggregateTicks != 0) {
             return;
         }
-        aggregateTicks = this.getWorld().aggregateTicks;
+        aggregateTicks = ((SpecialCraftWorld) this.getWorld()).aggregateTicks;
         // CraftBukkit-- end
         this.k();
         int i = 0;
@@ -407,7 +407,7 @@ public class SpecialWorld extends WorldServer {
             // CraftBukkit end
 
             // CraftBukkit-- start
-            final int totalTicks = this.getWorld().aggregateTicks;
+            final int totalTicks = ((SpecialCraftWorld) this.getWorld()).aggregateTicks;
             for (int ticks = totalTicks; ticks > 0; ticks--) {
                 // CraftBukkit-- end
 
