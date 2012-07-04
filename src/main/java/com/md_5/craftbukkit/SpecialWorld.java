@@ -35,9 +35,14 @@ import org.bukkit.generator.ChunkGenerator;
 
 public class SpecialWorld extends WorldServer {
 
+    public static float growthOdds = 100F;
     private TLongShortHashMap chunkTickList;
     public int tickEntityExceptions = 0;
+    private int tickChunkErrors;
+    public int tickChunkExceptions;
     private int R = this.random.nextInt(12000);
+    public int aggregateTicks = 1;
+    private float modifiedOdds = 100F;
 
     public SpecialWorld(MinecraftServer minecraftserver, IDataManager idatamanager, String s, int i, WorldSettings worldsettings, Environment env, ChunkGenerator gen) {
         super(minecraftserver, idatamanager, s, i, worldsettings, env, gen);
@@ -274,8 +279,6 @@ public class SpecialWorld extends WorldServer {
             }
         }
     }
-    public int aggregateTicks = 1;
-    private float modifiedOdds = 100F;
 
     protected void k() {
         // MethodProfiler.a("buildList"); // CraftBukkit - not in production code
@@ -343,8 +346,6 @@ public class SpecialWorld extends WorldServer {
 
         // MethodProfiler.a(); // CraftBukkit - not in production code
     }
-    private int tickChunkErrors;
-    public int tickChunkExceptions;
 
     @Override
     protected void l() {
