@@ -297,7 +297,7 @@ public class Extras extends JavaPlugin implements Listener {
         boolean hardcore = false;
 
         WorldServer internal = new SpecialWorld(console, new ServerNBTManager(craft.getWorldContainer(), name, true), name, dimension, new WorldSettings(creator.seed(), gamemode, generateStructures, hardcore, type), creator.environment(), generator);
-
+        setPrivate(internal, "server", new SpecialCraftWorld(internal, generator, creator.environment()));
         if (!(worlds.containsKey(name.toLowerCase()))) {
             return null;
         }
@@ -399,5 +399,15 @@ public class Extras extends JavaPlugin implements Listener {
             ex.printStackTrace();
         }
         return result;
+    }
+
+    private void setPrivate(Object clazz, String field, Object value) {
+        try {
+            Field f = clazz.getClass().getDeclaredField(field);
+            f.setAccessible(true);
+            f.set(clazz, value);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 }
