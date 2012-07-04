@@ -1,4 +1,4 @@
-package com.md_5.craftbukkit;
+package com.md_5.spigot;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -43,9 +43,9 @@ import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class Extras extends JavaPlugin implements Listener {
+public class Spigot extends JavaPlugin implements Listener {
 
-    public static Extras instance;
+    public static Spigot instance;
     //
     private String restartScriptLocation;
     private int timeoutTime;

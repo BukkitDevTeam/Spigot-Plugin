@@ -1,4 +1,4 @@
-package com.md_5.craftbukkit;
+package com.md_5.spigot;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -59,7 +59,7 @@ public class WatchdogThread extends Thread {
                 System.err.println(LINE);
 
                 if (this.restart) {
-                    Extras.instance.restart();
+                    Spigot.instance.restart();
                 }
 
                 //Give up

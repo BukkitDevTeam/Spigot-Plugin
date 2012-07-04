@@ -4,14 +4,14 @@ description: ${project.description}
 author: md_5
 website: ${project.url}
 
-main: com.md_5.craftbukkit.Extras
+main: com.md_5.spigot.Spigot
 
 commands:
   restart:
     description: Restart the server
-    permission: extras.restart
+    permission: spigot.restart
 
 permissions:
-  extras.restart:
+  spigot.restart:
     description: Allows restarting of the server
     default: op

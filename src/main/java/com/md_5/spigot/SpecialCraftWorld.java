@@ -1,4 +1,4 @@
-package com.md_5.craftbukkit;
+package com.md_5.spigot;
 
 import net.minecraft.server.WorldServer;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -16,7 +16,7 @@ public class SpecialCraftWorld extends CraftWorld {
     public SpecialCraftWorld(WorldServer world, ChunkGenerator gen, Environment env) {
         super(world, gen, env);
         // CraftBukkit-- Start
-        FileConfiguration configuration = Extras.instance.getConfig();
+        FileConfiguration configuration = Spigot.instance.getConfig();
         String name;
         if (world.worldData == null || world.worldData.name == null) {
             name = "default";
@@ -38,14 +38,14 @@ public class SpecialCraftWorld extends CraftWorld {
         mobSpawnRange = configuration.getInt("world-settings." + name + ".mob-spawn-range", mobSpawnRange);
         aggregateTicks = Math.max(1, configuration.getInt("world-settings." + name + ".aggregate-chunkticks", aggregateTicks));
 
-        Extras.instance.getLogger().info("-------------- [Extras] ----------------");
-        Extras.instance.getLogger().info("-------- World Settings For [" + name + "] --------");
-        Extras.instance.getLogger().info("Growth Per Chunk: " + growthPerTick);
-        Extras.instance.getLogger().info("Item Merge Radius: " + itemMergeRadius);
-        Extras.instance.getLogger().info("Random Lighting Updates: " + randomLightingUpdates);
-        Extras.instance.getLogger().info("Mob Spawn Range: " + mobSpawnRange);
-        Extras.instance.getLogger().info("Aggregate Ticks: " + aggregateTicks);
-        Extras.instance.getLogger().info("-------------------------------------------------");
+        Spigot.instance.getLogger().info("-------------- [Extras] ----------------");
+        Spigot.instance.getLogger().info("-------- World Settings For [" + name + "] --------");
+        Spigot.instance.getLogger().info("Growth Per Chunk: " + growthPerTick);
+        Spigot.instance.getLogger().info("Item Merge Radius: " + itemMergeRadius);
+        Spigot.instance.getLogger().info("Random Lighting Updates: " + randomLightingUpdates);
+        Spigot.instance.getLogger().info("Mob Spawn Range: " + mobSpawnRange);
+        Spigot.instance.getLogger().info("Aggregate Ticks: " + aggregateTicks);
+        Spigot.instance.getLogger().info("-------------------------------------------------");
         // CraftBukkit-- end
     }
 }

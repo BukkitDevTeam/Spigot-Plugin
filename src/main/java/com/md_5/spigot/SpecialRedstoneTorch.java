@@ -1,4 +1,4 @@
-package com.md_5.craftbukkit;
+package com.md_5.spigot;
 
 import gnu.trove.list.linked.TLongLinkedList;
 import gnu.trove.map.hash.TLongObjectHashMap;

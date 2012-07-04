@@ -4,13 +4,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.md_5</groupId>
-    <artifactId>craftbukkit-extras</artifactId>
+    <artifactId>spigot</artifactId>
     <version>dev-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>CraftBukkit-Extras</name>
-    <description>A set of utility features to support CraftBukkit--</description>
-    <url>https://github.com/EcoCityCraft/CraftBukkit-Extras</url>
+    <name>Spigot</name>
+    <description>The best performance increasing changes from various CraftBukkit mods bundled into a plugin!</description>
+    <url>https://github.com/EcoCityCraft/Spigot</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

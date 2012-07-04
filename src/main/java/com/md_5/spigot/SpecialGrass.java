@@ -1,4 +1,4 @@
-package com.md_5.craftbukkit;
+package com.md_5.spigot;
 
 import java.util.Random;
 import net.minecraft.server.Block;

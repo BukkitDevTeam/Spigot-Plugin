@@ -1,15 +1,16 @@
-package com.md_5.craftbukkit;
+package com.md_5.spigot;
 
 import java.util.Random;
-import net.minecraft.server.BlockReed;
+import net.minecraft.server.BlockCactus;
 import net.minecraft.server.World;
 
-public class SpecialReed extends BlockReed {
+public class SpecialCactus extends BlockCactus {
 
-    public SpecialReed(int i, int j) {
+    public SpecialCactus(int i, int j) {
         super(i, j);
     }
 
+    @Override
     public void a(World world, int i, int j, int k, Random random) {
         if (world.isEmpty(i, j + 1, k)) {
             int l;

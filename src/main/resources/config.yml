@@ -5,13 +5,13 @@ restart-on-crash: false
 filter-unsafe-ips: true
 whitelist-message: You are not white-listed on this server!
 world-settings:
-    default:
-        growth-chunks-per-tick: 650
-        item-merge-radius: 3.5
-        random-light-updates: false
-        aggregate-chunkticks: 4
-    world:
-        growth-chunks-per-tick: 1000
-    world_nether:
-        growth-chunks-per-tick: 0
-        random-light-updates: true
+  default:
+    growth-chunks-per-tick: 650
+    item-merge-radius: 3.5
+    random-light-updates: false
+    aggregate-chunkticks: 4
+  world:
+    growth-chunks-per-tick: 1000
+  world_nether:
+    growth-chunks-per-tick: 0
+    random-light-updates: true

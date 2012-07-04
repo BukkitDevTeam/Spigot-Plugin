@@ -1,4 +1,4 @@
-package com.md_5.craftbukkit;
+package com.md_5.spigot;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.logging.Level;
