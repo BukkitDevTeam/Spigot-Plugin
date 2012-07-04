@@ -5,6 +5,7 @@ author: md_5
 website: ${project.url}
 
 main: com.md_5.spigot.Spigot
+loadbefore: [pvparena]
 
 commands:
   restart:
